@@ -30,3 +30,7 @@ node_modules
 # Sublime project files
 *.sublime-project
 *.sublime-workspace
+
+# Python stuff
+env
+*.pyc
