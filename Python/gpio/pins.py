@@ -13,7 +13,7 @@ assert PINS_CONFIG_FILE
 class PinManager(object):
 
 	def __init__(self):
-		self.gpio = GPIO
+		self._gpio = GPIO
 		self._load_config()
 		self._initialize_pins()
 
@@ -22,13 +22,13 @@ class PinManager(object):
 			self.pin_config = yaml.safe_load(file_data)
 
 	def _setup_pin(self, number, mode, initial, resistor):
-	    mode = self.gpio.__getattribute__(mode)
-	    initial = self.gpio.__getattribute__(initial)
+	    mode = self._gpio.__getattribute__(mode)
+	    initial = self._gpio.__getattribute__(initial)
 	    if resistor:
-	        resistor = self.gpio.__getattribute__(resistor)
-	        self.gpio.setup(number, mode, initial=initial, pull_up_down=resistor)
+	        resistor = self._gpio.__getattribute__(resistor)
+	        self._gpio.setup(number, mode, initial=initial, pull_up_down=resistor)
 	    else:
-	        self.gpio.setup(number, mode, initial=initial)
+	        self._gpio.setup(number, mode, initial=initial)
 
 	def _initialize_pins(self):
 		for pin_num, pin_options in self.pin_config.items():
