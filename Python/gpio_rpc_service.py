@@ -1,4 +1,5 @@
 import os
+import json
 import pika
 
 
@@ -27,17 +28,18 @@ class RPCService(object):
         self.channel.basic_consume(self._handle_request, queue=self.queue_name)
 
     def _handle_request(self, ch, method, props, body):
-        print(body)
-        response = self._do_something()
+        response = self._perform_gpio_action(instruction=json.loads(body))
         ch.basic_publish(
             exchange='',
             routing_key=props.reply_to,
             properties=pika.BasicProperties(correlation_id=props.correlation_id),
-            body=response)
+            body=json.dumps(response))
         ch.basic_ack(delivery_tag = method.delivery_tag)
 
-    def _do_something(self):
-        return "something"
+    def _perform_gpio_action(self, instruction):
+        print(instruction['pin'])
+        print(instruction['action'])
+        return {'error': 0, 'pin': instruction['pin']}
 
     def start(self):
         try:
