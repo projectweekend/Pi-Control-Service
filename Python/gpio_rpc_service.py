@@ -39,18 +39,22 @@ class RPCService(object):
     def _do_something(self):
         return "something"
 
-    def run(self):
-    	try:
-        	self.channel.start_consuming()
-        except KeyboardInterrupt:
-        	self.channel.stop_consuming()
+    def start(self):
+        try:
+            self.channel.start_consuming()
+        except:
+            self.stop()
+            raise
+
+    def stop(self):
+        self.channel.stop_consuming()
         self.connection.close()
 
 
 def main():
-	rpc_service = RPCService(rabbit_url=RABBIT_URL, device_key=DEVICE_KEY)
-	rpc_service.run()
+    rpc_service = RPCService(rabbit_url=RABBIT_URL, device_key=DEVICE_KEY)
+    rpc_service.start()
 
 
 if __name__ == '__main__':
-	main()
+    main()
