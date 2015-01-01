@@ -2,6 +2,8 @@ import os
 import json
 import pika
 
+from pi_pin_manager import PinManager
+
 
 RABBIT_URL = os.getenv('RABBIT_URL', None)
 assert RABBIT_URL
@@ -9,13 +11,17 @@ assert RABBIT_URL
 DEVICE_KEY = os.getenv('DEVICE_KEY', None)
 assert DEVICE_KEY
 
+PIN_CONFIG = os.getenv('PIN_CONFIG', None)
+assert PIN_CONFIG
+
 
 class RPCService(object):
 
-    def __init__(self, rabbit_url, device_key):
+    def __init__(self, rabbit_url, device_key, pin_config):
         self.rabbit_url = rabbit_url
         self.queue_name = 'gpio_service'
         self.device_key = device_key
+        self.pins = PinManager(config_file=pin_config)
         self.connection = pika.BlockingConnection(pika.URLParameters(self.rabbit_url))
         self._setup_channel()
 
@@ -37,9 +43,12 @@ class RPCService(object):
         ch.basic_ack(delivery_tag = method.delivery_tag)
 
     def _perform_gpio_action(self, instruction):
-        print(instruction['pin'])
-        print(instruction['action'])
-        return {'error': 0, 'pin': instruction['pin']}
+        result = {'error': 0, 'pin': instruction['pin']}
+        try:
+            getattr(self.pins, instruction['action'])(instruction['pin'])
+        except:
+            result['error'] = 1
+        return result
 
     def start(self):
         try:
