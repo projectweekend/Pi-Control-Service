@@ -63,7 +63,7 @@ class RPCService(object):
 
 
 def main():
-    rpc_service = RPCService(rabbit_url=RABBIT_URL, device_key=DEVICE_KEY)
+    rpc_service = RPCService(rabbit_url=RABBIT_URL, device_key=DEVICE_KEY, pin_config=PIN_CONFIG)
     rpc_service.start()
 
 
