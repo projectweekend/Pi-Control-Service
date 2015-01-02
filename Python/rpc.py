@@ -4,10 +4,11 @@ import pika
 
 class RPCService(object):
 
-    def __init__(self, rabbit_url, queue_name, device_key):
+    def __init__(self, rabbit_url, queue_name, device_key, request_action):
         self.rabbit_url = rabbit_url
         self.queue_name = queue_name
         self.device_key = device_key
+        self.request_action = request_action
         self.connection = pika.BlockingConnection(pika.URLParameters(self.rabbit_url))
         self._setup_channel()
 
@@ -20,7 +21,7 @@ class RPCService(object):
         self.channel.basic_consume(self._handle_request, queue=self.queue_name)
 
     def _handle_request(self, ch, method, props, body):
-        response = {}
+        response = self.request_action(json.loads(body))
         ch.basic_publish(
             exchange='',
             routing_key=props.reply_to,
