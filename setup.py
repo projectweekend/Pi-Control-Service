@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='Pi-Control-Service',
-    version='0.0.1',
+    version='0.0.2',
     author='Brian Hines',
     author_email='brian@projectweekend.net',
     packages=['pi_control'],
