@@ -43,9 +43,9 @@ class RPCService(object):
         ch.basic_ack(delivery_tag = method.delivery_tag)
 
     def _perform_gpio_action(self, instruction):
-        result = {'error': 0, 'pin': instruction['pin']}
+        result = {'error': 0, 'pin': instruction['pin'], 'response': None}
         try:
-            getattr(self.pins, instruction['action'])(instruction['pin'])
+            result['response'] = getattr(self.pins, instruction['action'])(instruction['pin'])
         except:
             result['error'] = 1
         return result
