@@ -1,4 +1,4 @@
-Pi-GPIO-RPC-Service
+Pi-Control-Service
 ===================
 
-Control GPIO on a Raspberry Pi remotely using RabbitMQ
+Controla Raspberry Pi remotely using RabbitMQ
