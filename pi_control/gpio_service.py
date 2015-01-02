@@ -1,36 +1,30 @@
-import os
-
 from rpc import RPCService
 from pi_pin_manager import PinManager
 
 
-RABBIT_URL = os.getenv('RABBIT_URL', None)
-assert RABBIT_URL
-
-DEVICE_KEY = os.getenv('DEVICE_KEY', None)
-assert DEVICE_KEY
-
-PIN_CONFIG = os.getenv('PIN_CONFIG', None)
-assert PIN_CONFIG
+ALLOWED_ACTIONS = ('on', 'off', 'read')
 
 
 class GPIOService(RPCService):
 
     def __init__(self, rabbit_url, device_key, pin_config):
+        self.pins = PinManager(config_file=pin_config)
         super(GPIOService, self).__init__(
             rabbit_url=rabbit_url,
             queue_name='gpio_service',
             device_key=device_key,
             request_action=self._perform_gpio_action)
-        self.pins = PinManager(config_file=pin_config)
 
     def _perform_gpio_action(self, instruction):
         result = {'error': 1, 'pin': instruction['pin'], 'response': "An error occurred"}
+
+        if instruction['action'] not in ALLOWED_ACTIONS:
+            result['response'] = "'action' must be one of: {0}".format(', '.join(ALLOWED_ACTIONS))
+            return result
+
         try:
             result['response'] = getattr(self.pins, instruction['action'])(int(instruction['pin']))
             result['error'] = 0
-        except AttributeError:
-            result['response'] = "'{0}' is not a valid 'action'".format(instruction['action'])
         except ValueError:
             result['response'] = "'pin' value must be an integer"
         except:
@@ -38,17 +32,5 @@ class GPIOService(RPCService):
         return result
 
     def stop(self):
-        super(GPIOService, self).stop()
         self.pins.cleanup()
-
-
-def main():
-    gpio_service = GPIOService(
-        rabbit_url=RABBIT_URL,
-        device_key=DEVICE_KEY,
-        pin_config=PIN_CONFIG)
-    gpio_service.start()
-
-
-if __name__ == '__main__':
-    main()
+        super(GPIOService, self).stop()
