@@ -43,11 +43,16 @@ class RPCService(object):
         ch.basic_ack(delivery_tag = method.delivery_tag)
 
     def _perform_gpio_action(self, instruction):
-        result = {'error': 0, 'pin': instruction['pin'], 'response': None}
+        result = {'error': 1, 'pin': instruction['pin'], 'response': "An unhandled exception occurred"}
         try:
-            result['response'] = getattr(self.pins, instruction['action'])(instruction['pin'])
+            result['response'] = getattr(self.pins, instruction['action'])(int(instruction['pin']))
+            result['error'] = 0
+        except AttributeError:
+            result['response'] = "'{0}' is not a valid 'action'".format(instruction['action'])
+        except ValueError:
+            result['response'] = "'pin' value must be an integer"
         except:
-            result['error'] = 1
+            pass
         return result
 
     def start(self):
@@ -60,6 +65,7 @@ class RPCService(object):
     def stop(self):
         self.channel.stop_consuming()
         self.connection.close()
+        self.pins.cleanup()
 
 
 def main():
