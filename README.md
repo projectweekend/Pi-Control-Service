@@ -1,11 +1,8 @@
-Want to control a Raspberry Pi from anywhere? **Pi-Control-Service** makes that easy by listening for and responding to simple JSON messages. You only need these two things:
-
-* A [RabbitMQ](https://www.rabbitmq.com/) connection string.
-* An Internet connection.
+Want to control a Raspberry Pi from anywhere? Using **Pi-Control-Service** you only really need two things: a [RabbitMQ](https://www.rabbitmq.com/) connection string and an Internet connection.
 
 **What Can I Control?**
 
-In this early iteration of **Pi-Control-Service** you have access basic digital GPIO. You can turn pins on or off and read their current status. I am working to expand this by allowing you to implement custom commands that can be triggered. Using these you will be able do just about anything, like: access [I2C](http://en.wikipedia.org/wiki/I%C2%B2C), [SPI](http://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus), or the serial port, and issue system commands. Stay tuned.
+This project is still very young. In this iteration you have access basic digital GPIO. You can turn pins on or off and read their current values. I am actively working to expand this by allowing you to implement custom commands that can be triggered. Using this format you will be able to do just about anything, like: access [I2C](http://en.wikipedia.org/wiki/I%C2%B2C), [SPI](http://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus), or the serial port, and issue system commands. Stay tuned.
 
 
 ### Install it
@@ -16,11 +13,11 @@ pip install Pi-Control-Service
 
 ### GPIO service
 
-The GPIO service exposes access to the Raspberry Pi's digital GPIO pins. Using it you can turn pins on and off as well as read the value of a pin. The next two sections cover the specifics of its configuration and usage.
+The GPIO service (`pi_control_service.GPIOService`) exposes access to the Raspberry Pi's digital GPIO pins. Using it you can turn pins on and off as well as read their values. The next two sections cover specifics of its configuration and usage.
 
 #### Configuring the GPIO service
 
-A config file, written in [YAML](http://en.wikipedia.org/wiki/YAML), is used to define the initial pin setup. If a pin is not defined here it will not be available to **Pi-Control-Service**. The following snippet shows an example configuration file:
+A config file, written in [YAML](http://en.wikipedia.org/wiki/YAML), is used to define the initial pin setup. If a pin is not defined here it will not be available to **Pi-Control-Service**. You can save this file anywhere. You will provide a path for the module to access it in your code. The following snippet shows an example configuration file:
 
 ```yaml
 18:
@@ -60,11 +57,15 @@ gpio_service.start()
 
 #### Using the GPIO service
 
-For convenience there is a client library you can install and use on the computer that will be remotely controlling a Raspberry Pi. The `RABBIT_URL` and `DEVICE_KEY` values referenced in the section above are also used to connect the client.
+For convenience there is a client library you can install and use on the computer that will be remotely controlling a Raspberry Pi. The same `RABBIT_URL` and `DEVICE_KEY` values referenced in the section above are also used to connect the client.
+
+##### Installing the client
 
 ```
 pip install Pi-Control-Client
 ```
+
+##### Using the client
 
 ```python
 from pi_control_client import GPIOClient
