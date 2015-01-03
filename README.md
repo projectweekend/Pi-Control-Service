@@ -57,7 +57,7 @@ gpio_service.start()
 
 #### Using the GPIO service
 
-For convenience there is a client library you can install and use on the computer that will be remotely controlling a Raspberry Pi. The same `RABBIT_URL` and `DEVICE_KEY` values referenced in the section above are also used to connect the client.
+For convenience there is a [client library](https://github.com/projectweekend/Pi-Control-Client) you can install and use on the computer that will be remotely controlling a Raspberry Pi. The same `RABBIT_URL` and `DEVICE_KEY` values referenced in the section above are also used to connect the client.
 
 ##### Installing the client
 
