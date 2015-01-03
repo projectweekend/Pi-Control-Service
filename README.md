@@ -1,4 +1,4 @@
-Want to control a Raspberry Pi from anywhere? Using **Pi-Control-Service** you only really need two things: a [RabbitMQ](https://www.rabbitmq.com/) connection string and an Internet connection.
+Want to control a Raspberry Pi from anywhere? Using **Pi-Control-Service** you only really need two things: a [RabbitMQ](https://www.rabbitmq.com/) connection string and access to the Internet.
 
 **What Can I Control?**
 
