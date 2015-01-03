@@ -92,7 +92,7 @@ If you are already familar with RabbitMQ, you can implement your own client usin
 
 * The queue name is: `gpio_service`
 * The queue should bind to a direct exchange name matching the `DEVICE_KEY` value
-* The JSON messages sent to the broker should be formatted like:
+* The JSON messages sent to the broker should be formatted like the following examples:
 
 
 ##### Turn a pin on
