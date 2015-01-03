@@ -34,7 +34,7 @@ A config file, written in [YAML](http://en.wikipedia.org/wiki/YAML), is used to 
 ### Use it (Start the GPIO service on a Raspberry Pi)
 
 ```python
-from pi_control import GPIOService
+from pi_control_service import GPIOService
 
 
 # The RabbitMQ connection string
