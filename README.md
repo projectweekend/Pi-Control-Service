@@ -14,7 +14,11 @@ In this early iteration of **Pi-Control-Service** you have access basic digital 
 pip install Pi-Control-Service
 ```
 
-### Configure it
+### GPIO service
+
+The GPIO service exposes access to the Raspberry Pi's digital GPIO pins. Using it you can turn pins on and off as well as read the value of a pin. The next two sections cover the specifics of its configuration and usage.
+
+#### Configuring the GPIO service
 
 A config file, written in [YAML](http://en.wikipedia.org/wiki/YAML), is used to define the initial pin setup. If a pin is not defined here it will not be available to **Pi-Control-Service**. The following snippet shows an example configuration file:
 
@@ -31,7 +35,7 @@ A config file, written in [YAML](http://en.wikipedia.org/wiki/YAML), is used to 
 * `mode` - This controls whether the pin will be used for input or output. Accepted values are: `IN`, `OUT`. (Required)
 * `initial` - This controls the starting value of the pin. Accepted values are: `LOW`, `HIGH`. (Optional - defaults to `LOW`)
 
-### Use it (Start the GPIO service on a Raspberry Pi)
+#### Starting the GPIO service
 
 ```python
 from pi_control_service import GPIOService
@@ -40,28 +44,57 @@ from pi_control_service import GPIOService
 # The RabbitMQ connection string
 RABBIT_URL='some_actual_connection_string'
 
-# A unique string you make up to identify the single Raspberry Pi
+# A unique string you make up to identify a single Raspberry Pi
 DEVICE_KEY='raspberry_pi_coffee_maker'
 
-# Path to the config file references in the section above
+# Path to the config file referenced in the section above
 PIN_CONFIG = '/path/to/config/file.yml'
 
-gpio_service = GPIOService(rabbit_url=RABBIT_URL, device_key=DEVICE_KEY, pin_config=PIN_CONFIG)
+gpio_service = GPIOService(
+    rabbit_url=RABBIT_URL,
+    device_key=DEVICE_KEY,
+    pin_config=PIN_CONFIG)
+
 gpio_service.start()
 ```
 
-### Use it (Send the GPIO service commands)
+#### Using the GPIO service
 
-TODO: Add information about `GPIOClient`...
+For convenience there is a client library you can install and use on the computer that will be remotely controlling a Raspberry Pi. The `RABBIT_URL` and `DEVICE_KEY` values referenced in the section above are also used to connect the client.
 
-If you feel like learning a lot more about RabbitMQ, you can actually use any language or RabbitMQ library to create a client to communicate with your Raspberry Pi. It doesn't have to be Python at all. All you need to do is:
+```
+pip install Pi-Control-Client
+```
 
-* Connect to the RabbitMQ server using the same value as `RABBIT_URL` referenced above.
-* Bind to a direct exchange named using the value from `DEVICE_KEY`.
-* Start sending properly formed JSON messages to the queue.
+```python
+from pi_control_client import GPIOClient
+
+# The RabbitMQ connection string (must match the one used when starting the service)
+RABBIT_URL='some_actual_connection_string'
+
+# A unique string you make up to identify a single Raspberry Pi (must match the one used when starting the service)
+DEVICE_KEY='raspberry_pi_coffee_maker'
+
+pins_client = GPIOClient(rabbit_url=RABBIT_URL, device_key=DEVICE_KEY)
+
+# Turn a pin on
+pins_client.on(18)
+
+# Turn a pin off
+pins_client.off(18)
+
+# Read a pin value
+result = pins_client.read(18)
+```
+
+If you are already familar with RabbitMQ, you can implement your own client using any language. Things to know:
+
+* The queue name is: `gpio_service`
+* The queue should bind to a direct exchange name matching the `DEVICE_KEY` value
+* The JSON messages sent to the broker should be formatted like:
 
 
-#### Turn a pin on
+##### Turn a pin on
 ```json
 {
     "pin": 18,
@@ -70,7 +103,7 @@ If you feel like learning a lot more about RabbitMQ, you can actually use any la
 ```
 
 
-#### Turn a pin off
+##### Turn a pin off
 ```json
 {
     "pin": 18,
@@ -79,7 +112,7 @@ If you feel like learning a lot more about RabbitMQ, you can actually use any la
 ```
 
 
-#### Read a pin value
+##### Read a pin value
 ```json
 {
     "pin": 18,
