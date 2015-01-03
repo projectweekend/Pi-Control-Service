@@ -42,7 +42,7 @@ from pi_control_service import GPIOService
 RABBIT_URL='some_actual_connection_string'
 
 # A unique string you make up to identify a single Raspberry Pi
-DEVICE_KEY='raspberry_pi_coffee_maker'
+DEVICE_KEY='my_awesome_raspberry_pi'
 
 # Path to the config file referenced in the section above
 PIN_CONFIG = '/path/to/config/file.yml'
@@ -74,7 +74,7 @@ from pi_control_client import GPIOClient
 RABBIT_URL='some_actual_connection_string'
 
 # A unique string you make up to identify a single Raspberry Pi (must match the one used when starting the service)
-DEVICE_KEY='raspberry_pi_coffee_maker'
+DEVICE_KEY='my_awesome_raspberry_pi'
 
 pins_client = GPIOClient(rabbit_url=RABBIT_URL, device_key=DEVICE_KEY)
 
