@@ -2,10 +2,10 @@ from distutils.core import setup
 
 setup(
     name='Pi-Control-Service',
-    version='0.0.2',
+    version='0.0.3',
     author='Brian Hines',
     author_email='brian@projectweekend.net',
-    packages=['pi_control'],
+    packages=['pi_control_service'],
     url='http://pypi.python.org/pypi/Pi-Control-Service/',
     license='LICENSE.txt',
     description='Control a Raspberry Pi remotely using RabbitMQ.',

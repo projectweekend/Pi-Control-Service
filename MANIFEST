@@ -2,7 +2,7 @@
 CHANGES.txt
 README.txt
 setup.py
-pi_control/__init__.py
-pi_control/custom_service.py
-pi_control/gpio_service.py
-pi_control/rpc.py
+pi_control_service/__init__.py
+pi_control_service/custom_service.py
+pi_control_service/gpio_service.py
+pi_control_service/rpc.py
