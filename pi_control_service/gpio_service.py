@@ -27,8 +27,8 @@ class GPIOService(RPCService):
             result['error'] = 0
         except ValueError:
             result['response'] = "'pin' value must be an integer"
-        except:
-            pass
+        except Exception as e:
+            result['response'] = e.message
         return result
 
     def stop(self):
