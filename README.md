@@ -21,7 +21,7 @@ The GPIO service (`pi_control_service.GPIOService`) exposes access to the Raspbe
 
 ### Configuring the GPIO service
 
-A config file, written in [YAML](http://en.wikipedia.org/wiki/YAML), is used to define the initial pin setup. If a pin is not defined here it will not be available to **Pi-Control-Service**. You can save this file anywhere. You will provide a path for the module to access it in your code. The following snippet shows an example configuration file:
+A config file, written in [YAML](http://en.wikipedia.org/wiki/YAML), is used to define the initial pin setup. If a pin is not defined here it will not be available to **Pi-Control-Service**. You can save this file anywhere. You will provide a path to the file in your code. The following snippet shows an example configuration file:
 
 ```yaml
 18:
