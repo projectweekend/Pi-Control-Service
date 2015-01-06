@@ -15,31 +15,30 @@ class GPIOService(RPCService):
             device_key=device_key,
             request_action=self._perform_gpio_action)
 
-    def _perform_gpio_action(self, instruction):
-        result = {'error': 1, 'response': "An error occurred"}
+    def _error(self, response):
+        return {'error': 1, 'response': response}
 
-        if instruction['action'] not in ALLOWED_ACTIONS:
-            result['response'] = "'action' must be one of: {0}".format(', '.join(ALLOWED_ACTIONS))
-            return result
+    def _response(self, response):
+        return {'error': 0, 'response': response}
+
+    def _perform_gpio_action(self, instruction):
+        try:
+            if instruction['action'] not in ALLOWED_ACTIONS:
+                return self._error("'action' must be one of: {0}".format(', '.join(ALLOWED_ACTIONS)))
+        except KeyError:
+            return self._error("'action' must be defined")
 
         try:
-            pin = instruction['pin']
+            return self._response(getattr(self.pins, instruction['action'])(int(instruction['pin'])))
+        except ValueError:
+            return self._error("'pin' value must be an integer")
         except KeyError:
             try:
-                result['response'] = getattr(self.pins, instruction['action'])()
-                result['error'] = 0
+                return self._response(getattr(self.pins, instruction['action'])())
             except Exception as e:
-                result['response'] = e.message
-        else:
-            try:
-                result['response'] = getattr(self.pins, instruction['action'])(int(pin))
-                result['error'] = 0
-            except ValueError:
-                result['response'] = "'pin' value must be an integer"
-            except Exception as e:
-                result['response'] = e.message
-
-        return result
+                return self._error(e.message)
+        except Exception as e:
+            return self._error(e.message)
 
     def stop(self):
         self.pins.cleanup()
