@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Pi Control Service : Control a Raspberry Pi from anywhere">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Pi Control Service</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/projectweekend/Pi-Control-Service">View on GitHub</a>
+
+          <h1 id="project_title">Pi Control Service</h1>
+          <h2 id="project_tagline">Control a Raspberry Pi from anywhere</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/projectweekend/Pi-Control-Service/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/projectweekend/Pi-Control-Service/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>Want to control a Raspberry Pi from anywhere? You're in the right place.</p>
+
+<p><strong>What do I need?</strong></p>
+
+<p>Besides installing this library and using the documentation, you will need a connection string to a <a href="https://www.rabbitmq.com/">RabbitMQ</a> server and have your Raspberry Pi connected to the Internet.</p>
+
+<p><strong>What Can I Control?</strong></p>
+
+<p>Using the GPIO service (<code>pi_control_service.GPIOService</code>) you have access to the Raspberry Pi's digital GPIO pins. You can turn pins on and off as well as read their values. Using the custom action service (<code>pi_control_service.CustomActionService</code>) you can call methods on an "actions" class you implement. This allows you to do just about anything, like: access <a href="http://en.wikipedia.org/wiki/I%C2%B2C">I2C</a>, <a href="http://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus">SPI</a>, or the serial port, and issue system commands.</p>
+
+<h2>
+<a id="install-it" class="anchor" href="#install-it" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install it</h2>
+
+<pre><code>pip install Pi-Control-Service
+</code></pre>
+
+<h2>
+<a id="gpio-service" class="anchor" href="#gpio-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>GPIO service</h2>
+
+<p>The GPIO service (<code>pi_control_service.GPIOService</code>) exposes access to the Raspberry Pi's digital GPIO pins. Using it you can turn pins on and off as well as read their values. The next two sections cover specifics of its configuration and usage.</p>
+
+<h3>
+<a id="configuring-the-gpio-service" class="anchor" href="#configuring-the-gpio-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuring the GPIO service</h3>
+
+<p>A config file, written in <a href="http://en.wikipedia.org/wiki/YAML">YAML</a>, is used to define the initial pin setup. If a pin is not defined here it will not be available to <strong>Pi-Control-Service</strong>. You can save this file anywhere. You will provide a path to the file in your code. The following snippet shows an example configuration file:</p>
+
+<div class="highlight highlight-yaml"><pre><span class="pl-s1"><span class="pl-ent">18:</span></span>
+  <span class="pl-s1"><span class="pl-ent">mode:</span> <span class="pl-s1">OUT</span></span>
+  <span class="pl-s1"><span class="pl-ent">initial:</span> <span class="pl-s1">HIGH</span></span>
+<span class="pl-s1"><span class="pl-ent">23:</span></span>
+  <span class="pl-s1"><span class="pl-ent">mode:</span> <span class="pl-s1">OUT</span></span>
+  <span class="pl-s1"><span class="pl-ent">initial:</span> <span class="pl-s1">LOW</span></span></pre></div>
+
+<ul>
+<li>Add a numbered element for each pin to enable</li>
+<li>
+<code>mode</code> - This controls whether the pin will be used for input or output. Accepted values are: <code>IN</code>, <code>OUT</code>. (Required)</li>
+<li>
+<code>initial</code> - This controls the starting value of the pin. Accepted values are: <code>LOW</code>, <code>HIGH</code>. (Optional - defaults to <code>LOW</code>)</li>
+</ul>
+
+<h3>
+<a id="starting-the-gpio-service" class="anchor" href="#starting-the-gpio-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>Starting the GPIO service</h3>
+
+<div class="highlight highlight-python"><pre><span class="pl-k">from</span> pi_control_service <span class="pl-k">import</span> GPIOService
+
+
+<span class="pl-c"># The RabbitMQ connection string</span>
+RABBIT_URL<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'</span>some_actual_connection_string<span class="pl-pds">'</span></span>
+
+<span class="pl-c"># A unique string you make up to identify a single Raspberry Pi</span>
+DEVICE_KEY<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'</span>my_awesome_raspberry_pi<span class="pl-pds">'</span></span>
+
+<span class="pl-c"># Path to the config file referenced in the section above</span>
+PIN_CONFIG <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>/path/to/config/file.yml<span class="pl-pds">'</span></span>
+
+gpio_service <span class="pl-k">=</span> GPIOService(
+    <span class="pl-vpf">rabbit_url</span><span class="pl-k">=</span>RABBIT_URL,
+    <span class="pl-vpf">device_key</span><span class="pl-k">=</span>DEVICE_KEY,
+    <span class="pl-vpf">pin_config</span><span class="pl-k">=</span>PIN_CONFIG)
+
+gpio_service.start()</pre></div>
+
+<h3>
+<a id="using-the-gpio-service" class="anchor" href="#using-the-gpio-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using the GPIO service</h3>
+
+<p>For convenience there is a <a href="https://github.com/projectweekend/Pi-Control-Client">client library</a> you can install and use on the computer that will be remotely controlling a Raspberry Pi. The same <code>RABBIT_URL</code> and <code>DEVICE_KEY</code> values referenced in the section above are also used to connect the client.</p>
+
+<h4>
+<a id="installing-the-client" class="anchor" href="#installing-the-client" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installing the client</h4>
+
+<pre><code>pip install Pi-Control-Client
+</code></pre>
+
+<h4>
+<a id="using-the-client" class="anchor" href="#using-the-client" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using the client</h4>
+
+<div class="highlight highlight-python"><pre><span class="pl-k">from</span> pi_control_client <span class="pl-k">import</span> GPIOClient
+
+<span class="pl-c"># The RabbitMQ connection string (must match the one used when starting the service)</span>
+RABBIT_URL<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'</span>some_actual_connection_string<span class="pl-pds">'</span></span>
+
+<span class="pl-c"># A unique string you make up to identify a single Raspberry Pi (must match the one used when starting the service)</span>
+DEVICE_KEY<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'</span>my_awesome_raspberry_pi<span class="pl-pds">'</span></span>
+
+pins_client <span class="pl-k">=</span> GPIOClient(<span class="pl-vpf">rabbit_url</span><span class="pl-k">=</span>RABBIT_URL, <span class="pl-vpf">device_key</span><span class="pl-k">=</span>DEVICE_KEY)
+
+<span class="pl-c"># Turn a pin on</span>
+pins_client.on(<span class="pl-c1">18</span>)
+
+<span class="pl-c"># Turn a pin off</span>
+pins_client.off(<span class="pl-c1">18</span>)
+
+<span class="pl-c"># Read a pin value</span>
+result <span class="pl-k">=</span> pins_client.read(<span class="pl-c1">18</span>)</pre></div>
+
+<p>If you are already familar with RabbitMQ, you can implement your own client using any language. Things to know:</p>
+
+<ul>
+<li>The queue name is: <code>gpio_service</code>
+</li>
+<li>The queue should bind to a direct exchange name matching the <code>DEVICE_KEY</code> value</li>
+<li>The JSON messages sent to the broker should be formatted like the following examples:</li>
+</ul>
+
+<h4>
+<a id="turn-a-pin-on" class="anchor" href="#turn-a-pin-on" aria-hidden="true"><span class="octicon octicon-link"></span></a>Turn a pin on</h4>
+
+<div class="highlight highlight-json"><pre>{
+    <span class="pl-s1"><span class="pl-pds">"</span>pin<span class="pl-pds">"</span></span>: <span class="pl-c1">18</span>,
+    <span class="pl-s1"><span class="pl-pds">"</span>action<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>on<span class="pl-pds">"</span></span>
+}</pre></div>
+
+<h4>
+<a id="turn-a-pin-off" class="anchor" href="#turn-a-pin-off" aria-hidden="true"><span class="octicon octicon-link"></span></a>Turn a pin off</h4>
+
+<div class="highlight highlight-json"><pre>{
+    <span class="pl-s1"><span class="pl-pds">"</span>pin<span class="pl-pds">"</span></span>: <span class="pl-c1">18</span>,
+    <span class="pl-s1"><span class="pl-pds">"</span>action<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>off<span class="pl-pds">"</span></span>
+}</pre></div>
+
+<h4>
+<a id="read-a-pin-value" class="anchor" href="#read-a-pin-value" aria-hidden="true"><span class="octicon octicon-link"></span></a>Read a pin value</h4>
+
+<div class="highlight highlight-json"><pre>{
+    <span class="pl-s1"><span class="pl-pds">"</span>pin<span class="pl-pds">"</span></span>: <span class="pl-c1">18</span>,
+    <span class="pl-s1"><span class="pl-pds">"</span>action<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>read<span class="pl-pds">"</span></span>
+}</pre></div>
+
+<h2>
+<a id="custom-action-service" class="anchor" href="#custom-action-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>Custom action service</h2>
+
+<p>The custom action service (<code>pi_control_service.CustomActionService</code>) allows you to call methods on a special "actions" class that you define. Using it, the possibilities are almost limitless.</p>
+
+<h3>
+<a id="starting-the-custom-action-service" class="anchor" href="#starting-the-custom-action-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>Starting the custom action service</h3>
+
+<div class="highlight highlight-python"><pre><span class="pl-k">import</span> subprocess
+
+<span class="pl-k">from</span> pi_control_service <span class="pl-k">import</span> CustomActionService
+
+
+<span class="pl-c"># The RabbitMQ connection string</span>
+RABBIT_URL<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'</span>some_actual_connection_string<span class="pl-pds">'</span></span>
+
+<span class="pl-c"># A unique string you make up to identify a single Raspberry Pi</span>
+DEVICE_KEY<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'</span>my_awesome_raspberry_pi<span class="pl-pds">'</span></span>
+
+<span class="pl-c"># This class contains all the custom actions that the service will expose</span>
+<span class="pl-st">class</span> <span class="pl-en">Actions</span>(<span class="pl-e"><span class="pl-s3">object</span></span>):
+
+    <span class="pl-st">def</span> <span class="pl-en">hello_world</span>(<span class="pl-vpf">self</span>):
+        <span class="pl-k">return</span> {<span class="pl-s1"><span class="pl-pds">'</span>message<span class="pl-pds">'</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>I do what I want!<span class="pl-pds">"</span></span>}
+
+    <span class="pl-st">def</span> <span class="pl-en">cpu_temp</span>(<span class="pl-vpf">self</span>):
+        <span class="pl-k">return</span> subprocess.check_output([<span class="pl-s1"><span class="pl-pds">"</span>/opt/vc/bin/vcgencmd<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>measure_temp<span class="pl-pds">"</span></span>])
+
+
+custom_actions <span class="pl-k">=</span> CustomActionService(
+    <span class="pl-vpf">rabbit_url</span><span class="pl-k">=</span>RABBIT_URL,
+    <span class="pl-vpf">device_key</span><span class="pl-k">=</span>DEVICE_KEY,
+    <span class="pl-vpf">actions</span><span class="pl-k">=</span>Actions())
+
+custom_actions.start()</pre></div>
+
+<h3>
+<a id="using-the-custom-action-service" class="anchor" href="#using-the-custom-action-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using the custom action service</h3>
+
+<p>For convenience there is a <a href="https://github.com/projectweekend/Pi-Control-Client">client library</a> you can install and use on the computer that will be remotely controlling a Raspberry Pi. The same <code>RABBIT_URL</code> and <code>DEVICE_KEY</code> values referenced in the section above are also used to connect the client.</p>
+
+<h4>
+<a id="installing-the-client-1" class="anchor" href="#installing-the-client-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installing the client</h4>
+
+<pre><code>pip install Pi-Control-Client
+</code></pre>
+
+<h4>
+<a id="using-the-client-1" class="anchor" href="#using-the-client-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using the client</h4>
+
+<div class="highlight highlight-python"><pre><span class="pl-k">from</span> pi_control_client <span class="pl-k">import</span> CustomActionClient
+
+<span class="pl-c"># The RabbitMQ connection string (must match the one used when starting the service)</span>
+RABBIT_URL<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'</span>some_actual_connection_string<span class="pl-pds">'</span></span>
+
+<span class="pl-c"># A unique string you make up to identify a single Raspberry Pi (must match the one used when starting the service)</span>
+DEVICE_KEY<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'</span>my_awesome_raspberry_pi<span class="pl-pds">'</span></span>
+
+actions_client <span class="pl-k">=</span> CustomActionClient(<span class="pl-vpf">rabbit_url</span><span class="pl-k">=</span>RABBIT_URL, <span class="pl-vpf">device_key</span><span class="pl-k">=</span>DEVICE_KEY)
+
+<span class="pl-c"># Call a custom action</span>
+result <span class="pl-k">=</span> actions_client.call(<span class="pl-s1"><span class="pl-pds">'</span>name_of_action_method<span class="pl-pds">'</span></span>)</pre></div>
+
+<p>If you are already familar with RabbitMQ, you can implement your own client using any language. Things to know:</p>
+
+<ul>
+<li>The queue name is: <code>custom_action_service</code>
+</li>
+<li>The queue should bind to a direct exchange name matching the <code>DEVICE_KEY</code> value</li>
+<li>The JSON messages sent to the broker should be formatted like the following examples:</li>
+</ul>
+
+<h4>
+<a id="call-an-action" class="anchor" href="#call-an-action" aria-hidden="true"><span class="octicon octicon-link"></span></a>Call an action</h4>
+
+<div class="highlight highlight-json"><pre>{
+    <span class="pl-s1"><span class="pl-pds">"</span>action<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>name_of_action_method<span class="pl-pds">"</span></span>
+}</pre></div>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Pi Control Service maintained by <a href="https://github.com/projectweekend">projectweekend</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
