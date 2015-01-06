@@ -3,3 +3,4 @@ v0.0.2, 2015-01-02 -- Fix README.txt.
 v0.0.3, 2015-01-03 -- Rename package and update documentation.
 v0.0.4, 2015-01-03 -- Add custom action service.
 v0.0.5, 2015-01-05 -- Update Pi-Pin-Manager version.
+v0.0.6, 2015-01-05 -- Add get_config as GPIO action.
