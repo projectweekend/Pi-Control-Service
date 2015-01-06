@@ -15,12 +15,6 @@ class GPIOService(RPCService):
             device_key=device_key,
             request_action=self._perform_gpio_action)
 
-    def _error(self, response):
-        return {'error': 1, 'response': response}
-
-    def _response(self, response):
-        return {'error': 0, 'response': response}
-
     def _perform_gpio_action(self, instruction):
         try:
             if instruction['action'] not in ALLOWED_ACTIONS:

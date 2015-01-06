@@ -29,6 +29,12 @@ class RPCService(object):
             body=json.dumps(response))
         ch.basic_ack(delivery_tag = method.delivery_tag)
 
+    def _error(self, response):
+        return {'error': 1, 'response': response}
+
+    def _response(self, response):
+        return {'error': 0, 'response': response}
+
     def start(self):
         try:
             self.channel.start_consuming()
