@@ -82,6 +82,12 @@ DEVICE_KEY='my_awesome_raspberry_pi'
 
 pins_client = GPIOClient(rabbit_url=RABBIT_URL, device_key=DEVICE_KEY)
 
+# Get all pins config
+result = pins_client.get_config()
+
+# Get a pin config
+result = pins_client.get_config(18)
+
 # Turn a pin on
 pins_client.on(18)
 
