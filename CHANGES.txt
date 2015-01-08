@@ -7,3 +7,4 @@ v0.0.6, 2015-01-05 -- Add get_config as GPIO action.
 v0.0.7, 2015-01-05 -- Improve error handling.
 v0.0.8, 2015-01-05 -- Improve error handling in custom actions.
 v0.0.9, 2015-01-07 -- Enforce TTL on queue.
+v0.0.10, 2015-01-07 -- Bump version of Pi-Pin-Manager.
