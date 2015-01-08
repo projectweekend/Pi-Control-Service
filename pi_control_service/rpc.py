@@ -14,7 +14,7 @@ class RPCService(object):
 
     def _setup_channel(self):
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=self.queue_name)
+        self.channel.queue_declare(queue=self.queue_name, arguments={'x-message-ttl': 10000})
         self.channel.exchange_declare(exchange=self.device_key, type='direct')
         self.channel.queue_bind(exchange=self.device_key, queue=self.queue_name)
         self.channel.basic_qos(prefetch_count=1)
