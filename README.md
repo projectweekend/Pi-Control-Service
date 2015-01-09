@@ -80,22 +80,22 @@ RABBIT_URL='some_actual_connection_string'
 # A unique string you make up to identify a single Raspberry Pi (must match the one used when starting the service)
 DEVICE_KEY='my_awesome_raspberry_pi'
 
-pins_client = GPIOClient(rabbit_url=RABBIT_URL, device_key=DEVICE_KEY)
+pins_client = GPIOClient(rabbit_url=RABBIT_URL)
 
 # Get all pins config
-result = pins_client.get_config()
+result = pins_client.read_config(DEVICE_KEY)
 
 # Get a pin config
-result = pins_client.get_config(18)
+result = pins_client.read_config(DEVICE_KEY, 18)
 
 # Turn a pin on
-pins_client.on(18)
+pins_client.on(DEVICE_KEY, 18)
 
 # Turn a pin off
-pins_client.off(18)
+pins_client.off(DEVICE_KEY, 18)
 
 # Read a pin value
-result = pins_client.read(18)
+result = pins_client.read_value(DEVICE_KEY, 18)
 ```
 
 If you are already familar with RabbitMQ, you can implement your own client using any language. Things to know:
@@ -192,10 +192,10 @@ RABBIT_URL='some_actual_connection_string'
 # A unique string you make up to identify a single Raspberry Pi (must match the one used when starting the service)
 DEVICE_KEY='my_awesome_raspberry_pi'
 
-actions_client = CustomActionClient(rabbit_url=RABBIT_URL, device_key=DEVICE_KEY)
+actions_client = CustomActionClient(rabbit_url=RABBIT_URL)
 
 # Call a custom action
-result = actions_client.call('name_of_action_method')
+result = actions_client.call(DEVICE_KEY, 'name_of_action_method')
 ```
 
 If you are already familar with RabbitMQ, you can implement your own client using any language. Things to know:
