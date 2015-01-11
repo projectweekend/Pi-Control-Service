@@ -100,8 +100,8 @@ result = pins_client.read_value(DEVICE_KEY, 18)
 
 If you are already familar with RabbitMQ, you can implement your own client using any language. Things to know:
 
-* The queue name is: `gpio_service`
-* The queue should bind to a direct exchange name matching the `DEVICE_KEY` value
+* The exchange name is: `gpio_service`
+* The `DEVICE_KEY` value is the routing key
 * The JSON messages sent to the broker should be formatted like the following examples:
 
 
@@ -200,8 +200,8 @@ result = actions_client.call(DEVICE_KEY, 'name_of_action_method')
 
 If you are already familar with RabbitMQ, you can implement your own client using any language. Things to know:
 
-* The queue name is: `custom_action_service`
-* The queue should bind to a direct exchange name matching the `DEVICE_KEY` value
+* The exchange name is: `custom_action_service`
+* The `DEVICE_KEY` value is the routing key
 * The JSON messages sent to the broker should be formatted like the following examples:
 
 
