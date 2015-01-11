@@ -11,8 +11,8 @@ class GPIOService(RPCService):
         self.pins = PinManager(config_file=pin_config)
         super(GPIOService, self).__init__(
             rabbit_url=rabbit_url,
-            queue_name='gpio_service',
-            device_key=device_key,
+            exchange='gpio_service',
+            routing_key=device_key,
             request_action=self._perform_gpio_action)
 
     def _perform_gpio_action(self, instruction):
