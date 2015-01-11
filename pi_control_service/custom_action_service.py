@@ -12,8 +12,8 @@ class CustomActionService(RPCService):
         self._allowed_actions = filter(not_hidden_method, dir(self.actions))
         super(CustomActionService, self).__init__(
             rabbit_url=rabbit_url,
-            queue_name='custom_action_service',
-            device_key=device_key,
+            exchange='custom_action_service',
+            routing_key=device_key,
             request_action=self._perform_custom_action)
 
     def _perform_custom_action(self, instruction):
