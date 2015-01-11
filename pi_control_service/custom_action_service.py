@@ -8,8 +8,8 @@ def not_hidden_method(method_name):
 class CustomActionService(RPCService):
 
     def __init__(self, rabbit_url, device_key, actions):
-        self.actions = actions
-        self._allowed_actions = filter(not_hidden_method, dir(self.actions))
+        self._actions = actions
+        self._allowed_actions = filter(not_hidden_method, dir(self._actions))
         super(CustomActionService, self).__init__(
             rabbit_url=rabbit_url,
             exchange='custom_action_service',
@@ -24,6 +24,6 @@ class CustomActionService(RPCService):
             return self._error("'action' must be defined")
 
         try:
-            return self._response(getattr(self.actions, instruction['action'])())
+            return self._response(getattr(self._actions, instruction['action'])())
         except Exception as e:
             return self._error(e.message)
