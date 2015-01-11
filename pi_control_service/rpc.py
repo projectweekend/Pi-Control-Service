@@ -5,30 +5,30 @@ import pika
 class RPCService(object):
 
     def __init__(self, rabbit_url, user_key, device_key, request_action):
-        self.rabbit_url = rabbit_url
-        self.user_key = user_key
-        self.device_key = device_key
-        self.request_action = request_action
-        self.connection = pika.BlockingConnection(pika.URLParameters(self.rabbit_url))
+        self._rabbit_url = rabbit_url
+        self._user_key = user_key
+        self._device_key = device_key
+        self._request_action = request_action
+        self._connection = pika.BlockingConnection(pika.URLParameters(self._rabbit_url))
         self._setup_channel()
 
     def _setup_channel(self):
-        self.channel = self.connection.channel()
+        self._channel = self._connection.channel()
 
-        result = self.channel.queue_declare(
+        result = self._channel.queue_declare(
             auto_delete=True,
             arguments={'x-message-ttl': 10000})
 
-        self.channel.exchange_declare(exchange=self.user_key, type='direct')
-        self.channel.queue_bind(
+        self._channel.exchange_declare(exchange=self._user_key, type='direct')
+        self._channel.queue_bind(
             queue=result.method.queue,
-            exchange=self.user_key,
-            routing_key=self.device_key)
-        self.channel.basic_qos(prefetch_count=1)
-        self.channel.basic_consume(self._handle_request, queue=result.method.queue)
+            exchange=self._user_key,
+            routing_key=self._device_key)
+        self._channel.basic_qos(prefetch_count=1)
+        self._channel.basic_consume(self._handle_request, queue=result.method.queue)
 
     def _handle_request(self, ch, method, props, body):
-        response = self.request_action(json.loads(body))
+        response = self._request_action(json.loads(body))
         ch.basic_publish(
             exchange='',
             routing_key=props.reply_to,
@@ -44,11 +44,11 @@ class RPCService(object):
 
     def start(self):
         try:
-            self.channel.start_consuming()
+            self._channel.start_consuming()
         except:
             self.stop()
             raise
 
     def stop(self):
-        self.channel.stop_consuming()
-        self.connection.close()
+        self._channel.stop_consuming()
+        self._connection.close()
