@@ -4,10 +4,10 @@ import pika
 
 class RPCService(object):
 
-    def __init__(self, rabbit_url, user_key, device_key, request_action):
+    def __init__(self, rabbit_url, exchange, routing_key, request_action):
         self._rabbit_url = rabbit_url
-        self._user_key = user_key
-        self._device_key = device_key
+        self._exchange = exchange
+        self._routing_key = routing_key
         self._request_action = request_action
         self._connection = pika.BlockingConnection(pika.URLParameters(self._rabbit_url))
         self._setup_channel()
@@ -19,11 +19,11 @@ class RPCService(object):
             auto_delete=True,
             arguments={'x-message-ttl': 10000})
 
-        self._channel.exchange_declare(exchange=self._user_key, type='direct')
+        self._channel.exchange_declare(exchange=self._exchange, type='direct')
         self._channel.queue_bind(
             queue=result.method.queue,
-            exchange=self._user_key,
-            routing_key=self._device_key)
+            exchange=self._exchange,
+            routing_key=self._routing_key)
         self._channel.basic_qos(prefetch_count=1)
         self._channel.basic_consume(self._handle_request, queue=result.method.queue)
 
