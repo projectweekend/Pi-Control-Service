@@ -4,9 +4,9 @@ import pika
 
 class RPCService(object):
 
-    def __init__(self, rabbit_url, queue_name, device_key, request_action):
+    def __init__(self, rabbit_url, user_key, device_key, request_action):
         self.rabbit_url = rabbit_url
-        self.queue_name = queue_name
+        self.user_key = user_key
         self.device_key = device_key
         self.request_action = request_action
         self.connection = pika.BlockingConnection(pika.URLParameters(self.rabbit_url))
@@ -14,11 +14,18 @@ class RPCService(object):
 
     def _setup_channel(self):
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=self.queue_name, arguments={'x-message-ttl': 10000})
-        self.channel.exchange_declare(exchange=self.device_key, type='direct')
-        self.channel.queue_bind(exchange=self.device_key, queue=self.queue_name)
+
+        result = self.channel.queue_declare(
+            auto_delete=True,
+            arguments={'x-message-ttl': 10000})
+
+        self.channel.exchange_declare(exchange=self.user_key, type='direct')
+        self.channel.queue_bind(
+            queue=result.method.queue,
+            exchange=self.user_key,
+            routing_key=self.device_key)
         self.channel.basic_qos(prefetch_count=1)
-        self.channel.basic_consume(self._handle_request, queue=self.queue_name)
+        self.channel.basic_consume(self._handle_request, queue=result.method.queue)
 
     def _handle_request(self, ch, method, props, body):
         response = self.request_action(json.loads(body))
