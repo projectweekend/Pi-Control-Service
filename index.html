@@ -116,23 +116,29 @@ RABBIT_URL<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'<
 <span class="pl-c"># A unique string you make up to identify a single Raspberry Pi (must match the one used when starting the service)</span>
 DEVICE_KEY<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'</span>my_awesome_raspberry_pi<span class="pl-pds">'</span></span>
 
-pins_client <span class="pl-k">=</span> GPIOClient(<span class="pl-vpf">rabbit_url</span><span class="pl-k">=</span>RABBIT_URL, <span class="pl-vpf">device_key</span><span class="pl-k">=</span>DEVICE_KEY)
+pins_client <span class="pl-k">=</span> GPIOClient(<span class="pl-vpf">rabbit_url</span><span class="pl-k">=</span>RABBIT_URL)
+
+<span class="pl-c"># Get all pins config</span>
+result <span class="pl-k">=</span> pins_client.read_config(DEVICE_KEY)
+
+<span class="pl-c"># Get a pin config</span>
+result <span class="pl-k">=</span> pins_client.read_config(DEVICE_KEY, <span class="pl-c1">18</span>)
 
 <span class="pl-c"># Turn a pin on</span>
-pins_client.on(<span class="pl-c1">18</span>)
+pins_client.on(DEVICE_KEY, <span class="pl-c1">18</span>)
 
 <span class="pl-c"># Turn a pin off</span>
-pins_client.off(<span class="pl-c1">18</span>)
+pins_client.off(DEVICE_KEY, <span class="pl-c1">18</span>)
 
 <span class="pl-c"># Read a pin value</span>
-result <span class="pl-k">=</span> pins_client.read(<span class="pl-c1">18</span>)</pre></div>
+result <span class="pl-k">=</span> pins_client.read_value(DEVICE_KEY, <span class="pl-c1">18</span>)</pre></div>
 
 <p>If you are already familar with RabbitMQ, you can implement your own client using any language. Things to know:</p>
 
 <ul>
-<li>The queue name is: <code>gpio_service</code>
+<li>The exchange name is: <code>gpio_service</code>
 </li>
-<li>The queue should bind to a direct exchange name matching the <code>DEVICE_KEY</code> value</li>
+<li>The <code>DEVICE_KEY</code> value is the routing key</li>
 <li>The JSON messages sent to the broker should be formatted like the following examples:</li>
 </ul>
 
@@ -158,6 +164,21 @@ result <span class="pl-k">=</span> pins_client.read(<span class="pl-c1">18</span
 <div class="highlight highlight-json"><pre>{
     <span class="pl-s1"><span class="pl-pds">"</span>pin<span class="pl-pds">"</span></span>: <span class="pl-c1">18</span>,
     <span class="pl-s1"><span class="pl-pds">"</span>action<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>read<span class="pl-pds">"</span></span>
+}</pre></div>
+
+<h4>
+<a id="read-config-for-all-pins" class="anchor" href="#read-config-for-all-pins" aria-hidden="true"><span class="octicon octicon-link"></span></a>Read config for all pins</h4>
+
+<div class="highlight highlight-json"><pre>{
+    <span class="pl-s1"><span class="pl-pds">"</span>action<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>get_config<span class="pl-pds">"</span></span>
+}</pre></div>
+
+<h4>
+<a id="read-config-for-one-pin" class="anchor" href="#read-config-for-one-pin" aria-hidden="true"><span class="octicon octicon-link"></span></a>Read config for one pin</h4>
+
+<div class="highlight highlight-json"><pre>{
+    <span class="pl-s1"><span class="pl-pds">"</span>pin<span class="pl-pds">"</span></span>: <span class="pl-c1">18</span>
+    <span class="pl-s1"><span class="pl-pds">"</span>action<span class="pl-pds">"</span></span><span class="pl-ii">:</span> <span class="pl-s1"><span class="pl-pds">"</span>get_config<span class="pl-pds">"</span></span>
 }</pre></div>
 
 <h2>
@@ -218,17 +239,17 @@ RABBIT_URL<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'<
 <span class="pl-c"># A unique string you make up to identify a single Raspberry Pi (must match the one used when starting the service)</span>
 DEVICE_KEY<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'</span>my_awesome_raspberry_pi<span class="pl-pds">'</span></span>
 
-actions_client <span class="pl-k">=</span> CustomActionClient(<span class="pl-vpf">rabbit_url</span><span class="pl-k">=</span>RABBIT_URL, <span class="pl-vpf">device_key</span><span class="pl-k">=</span>DEVICE_KEY)
+actions_client <span class="pl-k">=</span> CustomActionClient(<span class="pl-vpf">rabbit_url</span><span class="pl-k">=</span>RABBIT_URL)
 
 <span class="pl-c"># Call a custom action</span>
-result <span class="pl-k">=</span> actions_client.call(<span class="pl-s1"><span class="pl-pds">'</span>name_of_action_method<span class="pl-pds">'</span></span>)</pre></div>
+result <span class="pl-k">=</span> actions_client.call(DEVICE_KEY, <span class="pl-s1"><span class="pl-pds">'</span>name_of_action_method<span class="pl-pds">'</span></span>)</pre></div>
 
 <p>If you are already familar with RabbitMQ, you can implement your own client using any language. Things to know:</p>
 
 <ul>
-<li>The queue name is: <code>custom_action_service</code>
+<li>The exchange name is: <code>custom_action_service</code>
 </li>
-<li>The queue should bind to a direct exchange name matching the <code>DEVICE_KEY</code> value</li>
+<li>The <code>DEVICE_KEY</code> value is the routing key</li>
 <li>The JSON messages sent to the broker should be formatted like the following examples:</li>
 </ul>
 
