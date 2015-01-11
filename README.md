@@ -132,6 +132,23 @@ If you are already familar with RabbitMQ, you can implement your own client usin
 ```
 
 
+#### Read config for all pins
+```json
+{
+    "action": "get_config"
+}
+```
+
+
+#### Read config for one pin
+```json
+{
+    "pin": 18
+    "action": "get_config"
+}
+```
+
+
 ## Custom action service
 
 The custom action service (`pi_control_service.CustomActionService`) allows you to call methods on a special "actions" class that you define. Using it, the possibilities are almost limitless.
