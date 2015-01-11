@@ -8,7 +8,7 @@ ALLOWED_ACTIONS = ('on', 'off', 'read', 'get_config')
 class GPIOService(RPCService):
 
     def __init__(self, rabbit_url, device_key, pin_config):
-        self.pins = PinManager(config_file=pin_config)
+        self._pins = PinManager(config_file=pin_config)
         super(GPIOService, self).__init__(
             rabbit_url=rabbit_url,
             exchange='gpio_service',
@@ -23,17 +23,17 @@ class GPIOService(RPCService):
             return self._error("'action' must be defined")
 
         try:
-            return self._response(getattr(self.pins, instruction['action'])(int(instruction['pin'])))
+            return self._response(getattr(self._pins, instruction['action'])(int(instruction['pin'])))
         except ValueError:
             return self._error("'pin' value must be an integer")
         except KeyError:
             try:
-                return self._response(getattr(self.pins, instruction['action'])())
+                return self._response(getattr(self._pins, instruction['action'])())
             except Exception as e:
                 return self._error(e.message)
         except Exception as e:
             return self._error(e.message)
 
     def stop(self):
-        self.pins.cleanup()
+        self._pins.cleanup()
         super(GPIOService, self).stop()
