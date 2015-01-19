@@ -1,10 +1,8 @@
-Want to control a Raspberry Pi from anywhere? You're in the right place.
+**Why I made this**
 
-**What do I need?**
+This project started because I had an external web server and I wanted it to get some data from sensors on a Raspberry Pi in my apartment. I didn't want to mess with a bunch of stupid networking, so that the two could talk to each other. Instead, I decided to take advantage of [RabbitMQ](https://www.rabbitmq.com/). Messaging queues, like RabbitMQ, are a common tactic for letting separate application components communicate in a simple, scalable way. It's also a great fit for controlling the Raspberry Pi in many [Internet of Things](http://en.wikipedia.org/wiki/Internet_of_Things) type projects.
 
-Besides installing this library and using the documentation, you will need a connection string to a [RabbitMQ](https://www.rabbitmq.com/) server and have your Raspberry Pi connected to the Internet.
-
-**What Can I Control?**
+**What it does**
 
 Using the GPIO service (`pi_control_service.GPIOService`) you have access to the Raspberry Pi's digital GPIO pins. You can turn pins on and off as well as read their values. Using the custom action service (`pi_control_service.CustomActionService`) you can call methods on an "actions" class you implement. This allows you to do just about anything, like: access [I2C](http://en.wikipedia.org/wiki/I%C2%B2C), [SPI](http://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus), or the serial port, and issue system commands.
 
