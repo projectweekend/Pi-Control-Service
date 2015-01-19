@@ -143,7 +143,7 @@ If you are already familar with RabbitMQ, you can implement your own client usin
 #### Read config for one pin
 ```json
 {
-    "pin": 18
+    "pin": 18,
     "action": "get_config"
 }
 ```
