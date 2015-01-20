@@ -36,6 +36,8 @@ A config file, written in [YAML](http://en.wikipedia.org/wiki/YAML), is used to 
 
 ### Starting the GPIO service
 
+This part runs on your Raspberry Pi. It initializes the desired GPIO pins, connects to RabbitMQ and starts listening for messages.
+
 ```python
 from pi_control_service import GPIOService
 
@@ -153,6 +155,8 @@ The custom action service (`pi_control_service.CustomActionService`) allows you 
 
 
 ### Starting the custom action service
+
+This part runs on your Raspberry Pi. It connects to RabbitMQ and starts listening for messages.
 
 ```python
 import subprocess
