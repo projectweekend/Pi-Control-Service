@@ -31,13 +31,11 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <p>Want to control a Raspberry Pi from anywhere? You're in the right place.</p>
+        <p><strong>Why I made this</strong></p>
 
-<p><strong>What do I need?</strong></p>
+<p>This project started because I had an external web server and I wanted it to get some data from sensors on a Raspberry Pi in my apartment. I didn't want to mess with a bunch of stupid networking, so that the two could talk to each other. Instead, I decided to take advantage of <a href="https://www.rabbitmq.com/">RabbitMQ</a>. Messaging queues, like RabbitMQ, are a common tactic for letting separate application components communicate in a simple, scalable way. It's also a great fit for controlling the Raspberry Pi in many <a href="http://en.wikipedia.org/wiki/Internet_of_Things">Internet of Things</a> type projects.</p>
 
-<p>Besides installing this library and using the documentation, you will need a connection string to a <a href="https://www.rabbitmq.com/">RabbitMQ</a> server and have your Raspberry Pi connected to the Internet.</p>
-
-<p><strong>What Can I Control?</strong></p>
+<p><strong>What it does</strong></p>
 
 <p>Using the GPIO service (<code>pi_control_service.GPIOService</code>) you have access to the Raspberry Pi's digital GPIO pins. You can turn pins on and off as well as read their values. Using the custom action service (<code>pi_control_service.CustomActionService</code>) you can call methods on an "actions" class you implement. This allows you to do just about anything, like: access <a href="http://en.wikipedia.org/wiki/I%C2%B2C">I2C</a>, <a href="http://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus">SPI</a>, or the serial port, and issue system commands.</p>
 
@@ -177,8 +175,8 @@ result <span class="pl-k">=</span> pins_client.read_value(DEVICE_KEY, <span clas
 <a id="read-config-for-one-pin" class="anchor" href="#read-config-for-one-pin" aria-hidden="true"><span class="octicon octicon-link"></span></a>Read config for one pin</h4>
 
 <div class="highlight highlight-json"><pre>{
-    <span class="pl-s1"><span class="pl-pds">"</span>pin<span class="pl-pds">"</span></span>: <span class="pl-c1">18</span>
-    <span class="pl-s1"><span class="pl-pds">"</span>action<span class="pl-pds">"</span></span><span class="pl-ii">:</span> <span class="pl-s1"><span class="pl-pds">"</span>get_config<span class="pl-pds">"</span></span>
+    <span class="pl-s1"><span class="pl-pds">"</span>pin<span class="pl-pds">"</span></span>: <span class="pl-c1">18</span>,
+    <span class="pl-s1"><span class="pl-pds">"</span>action<span class="pl-pds">"</span></span>: <span class="pl-s1"><span class="pl-pds">"</span>get_config<span class="pl-pds">"</span></span>
 }</pre></div>
 
 <h2>
