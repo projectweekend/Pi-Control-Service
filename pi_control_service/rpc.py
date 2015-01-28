@@ -36,10 +36,12 @@ class RPCService(object):
             body=json.dumps(response))
         ch.basic_ack(delivery_tag = method.delivery_tag)
 
-    def _error(self, response):
+    @staticmethod
+    def _error(response):
         return {'error': 1, 'response': response}
 
-    def _response(self, response):
+    @staticmethod
+    def _response(response):
         return {'error': 0, 'response': response}
 
     def start(self):
