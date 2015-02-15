@@ -59,6 +59,10 @@ gpio_service = GPIOService(
 gpio_service.start()
 ```
 
+**Note:**
+In addition to the example above, the `GPIOService` class takes an optional argument `reconnect_attempts`. This is in integer represneting the number of times to attempt reconnection with RabbitMQ. These attempts will be made if the connection to RabbitMQ is interrupted after the `start()` method is called.
+
+
 ### Using the GPIO service
 
 For convenience there is a [client library](https://github.com/projectweekend/Pi-Control-Client) you can install and use on the computer that will be remotely controlling a Raspberry Pi. The same `RABBIT_URL` and `DEVICE_KEY` values referenced in the section above are also used to connect the client.
