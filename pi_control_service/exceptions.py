@@ -1,0 +1,2 @@
+class TooManyReconnectionAttempts(Exception):
+    pass

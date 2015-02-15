@@ -1,16 +1,33 @@
 import json
 import pika
+import pyecho
+
+from exceptions import TooManyReconnectionAttempts
 
 
 class RPCService(object):
 
-    def __init__(self, rabbit_url, exchange, routing_key, request_action):
+    def __init__(self, rabbit_url, exchange, routing_key, request_action, reconnect_attempts=5):
         self._rabbit_url = rabbit_url
         self._exchange = exchange
         self._routing_key = routing_key
         self._request_action = request_action
-        self._connection = pika.BlockingConnection(pika.URLParameters(self._rabbit_url))
+        self._reconnect_attempts = reconnect_attempts
+        self._connect()
         self._setup_channel()
+
+    def _connect(self):
+        self._connection = pika.BlockingConnection(pika.URLParameters(self._rabbit_url))
+
+    def _reconnect(self):
+        @pyecho.echo(self._reconnect_attempts)
+        def attempt_reconnect():
+            self._connect()
+        try:
+            attempt_reconnect()
+        except pyecho.FailingTooHard:
+            message = 'Reconnection attempts exceeded {0}'.format(self._reconnect_attempts)
+            raise TooManyReconnectionAttempts(message)
 
     def _setup_channel(self):
         self._channel = self._connection.channel()
@@ -34,7 +51,7 @@ class RPCService(object):
             routing_key=props.reply_to,
             properties=pika.BasicProperties(correlation_id=props.correlation_id),
             body=json.dumps(response))
-        ch.basic_ack(delivery_tag = method.delivery_tag)
+        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     @staticmethod
     def _error(response):
@@ -47,10 +64,10 @@ class RPCService(object):
     def start(self):
         try:
             self._channel.start_consuming()
-        except:
-            self.stop()
-            raise
-
-    def stop(self):
-        self._channel.stop_consuming()
-        self._connection.close()
+        except KeyboardInterrupt:
+            self._channel.stop_consuming()
+            self._connection.close()
+        except pika.exceptions.AMQPConnectionError:
+            self._reconnect()
+            self._setup_channel()
+            self.start()

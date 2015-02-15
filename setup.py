@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='Pi-Control-Service',
-    version='0.1.2',
+    version='1.0.0',
     author='Brian Hines',
     author_email='brian@projectweekend.net',
     packages=['pi_control_service'],
@@ -13,5 +13,6 @@ setup(
     install_requires=[
         "pika == 0.9.14",
         "Pi-Pin-Manager == 0.1.0",
+        "pyecho == 0.0.2",
     ],
 )
