@@ -9,3 +9,4 @@ v0.0.8, 2015-01-05 -- Improve error handling in custom actions.
 v0.0.9, 2015-01-07 -- Enforce TTL on queue.
 v0.0.10, 2015-01-07 -- Bump version of Pi-Pin-Manager.
 v0.1.0, 2015-01-10 -- Exchanges used to distinguish service type, routing keys used to distinguish devices.
+v1.0.2 2015-02-15 -- Reorganizing some internal components.
