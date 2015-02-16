@@ -1,4 +1,4 @@
-from rpc import RPCService
+from pika_pack import RPCBlockingListener
 
 from mixins import ServiceUtils
 
@@ -7,7 +7,7 @@ def not_hidden_method(method_name):
     return not (method_name.startswith('_') or method_name.startswith('__'))
 
 
-class CustomActionService(ServiceUtils, RPCService):
+class CustomActionService(ServiceUtils, RPCBlockingListener):
 
     def __init__(self, rabbit_url, device_key, actions):
         self._actions = actions

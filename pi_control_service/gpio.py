@@ -1,4 +1,4 @@
-from rpc import RPCService
+from pika_pack import RPCBlockingListener
 from pi_pin_manager import PinManager
 
 from mixins import ServiceUtils
@@ -7,7 +7,7 @@ from mixins import ServiceUtils
 ALLOWED_ACTIONS = ('on', 'off', 'read', 'get_config')
 
 
-class GPIOService(ServiceUtils, RPCService):
+class GPIOService(ServiceUtils, RPCBlockingListener):
 
     def __init__(self, rabbit_url, device_key, pin_config):
         self._pins = PinManager(config_file=pin_config)
