@@ -1,11 +1,13 @@
 from rpc import RPCService
 from pi_pin_manager import PinManager
 
+from mixins import ServiceUtils
+
 
 ALLOWED_ACTIONS = ('on', 'off', 'read', 'get_config')
 
 
-class GPIOService(RPCService):
+class GPIOService(ServiceUtils, RPCService):
 
     def __init__(self, rabbit_url, device_key, pin_config):
         self._pins = PinManager(config_file=pin_config)
@@ -14,14 +16,6 @@ class GPIOService(RPCService):
             exchange='gpio_service',
             routing_key=device_key,
             request_action=self._perform_gpio_action)
-
-    @staticmethod
-    def _error(response):
-        return {'error': 1, 'response': response}
-
-    @staticmethod
-    def _response(response):
-        return {'error': 0, 'response': response}
 
     def _perform_gpio_action(self, instruction):
         try:
