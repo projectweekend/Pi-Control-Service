@@ -13,3 +13,4 @@ v1.0.2 2015-02-15 -- Reorganizing some internal components.
 v1.0.3 2015-02-15 -- Reorganizing some internal components.
 v1.0.4 2015-02-15 -- Refactor to use Pika-Pack.
 v1.1.2 2015-02-16 -- Update for Pika-Pack changes.
+v1.2.0 2015-02-17 -- Better naming of things.
