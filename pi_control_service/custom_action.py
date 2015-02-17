@@ -7,14 +7,14 @@ def not_hidden_method(method_name):
     return not (method_name.startswith('_') or method_name.startswith('__'))
 
 
-class CustomActionService(ServiceUtils, RPCBlockingConsumer):
+class CustomActionControlService(ServiceUtils, RPCBlockingConsumer):
 
     def __init__(self, rabbit_url, device_key, actions):
         self._actions = actions
         self._allowed_actions = filter(not_hidden_method, dir(self._actions))
-        super(CustomActionService, self).__init__(
+        super(CustomActionControlService, self).__init__(
             rabbit_url=rabbit_url,
-            exchange='custom_action_service',
+            exchange='custom_action_control',
             routing_key=device_key,
             request_action=self._perform_custom_action)
 

@@ -4,7 +4,7 @@ This project started because I had an external web server and I wanted it to get
 
 **What it does**
 
-Using the GPIO service (`pi_control_service.GPIOService`) you have access to the Raspberry Pi's digital GPIO pins. You can turn pins on and off as well as read their values. Using the custom action service (`pi_control_service.CustomActionService`) you can call methods on an "actions" class you implement. This allows you to do just about anything, like: access [I2C](http://en.wikipedia.org/wiki/I%C2%B2C), [SPI](http://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus), or the serial port, and issue system commands.
+Using the GPIO service (`pi_control_service.GPIOControlService`) you have access to the Raspberry Pi's digital GPIO pins. You can turn pins on and off as well as read their values. Using the custom action service (`pi_control_service.CustomActionControlService`) you can call methods on an "actions" class you implement. This allows you to do just about anything, like: access [I2C](http://en.wikipedia.org/wiki/I%C2%B2C), [SPI](http://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus), or the serial port, and issue system commands.
 
 
 ## Install it
@@ -13,11 +13,11 @@ Using the GPIO service (`pi_control_service.GPIOService`) you have access to the
 pip install Pi-Control-Service
 ```
 
-## GPIO service
+## GPIO control service
 
-The GPIO service (`pi_control_service.GPIOService`) exposes access to the Raspberry Pi's digital GPIO pins. Using it you can turn pins on and off as well as read their values. The next two sections cover specifics of its configuration and usage.
+The GPIO service (`pi_control_service.GPIOControlService`) exposes access to the Raspberry Pi's digital GPIO pins. Using it you can turn pins on and off as well as read their values. The next two sections cover specifics of its configuration and usage.
 
-### Configuring the GPIO service
+### Configuring the GPIO control service
 
 A config file, written in [YAML](http://en.wikipedia.org/wiki/YAML), is used to define the initial pin setup. If a pin is not defined here it will not be available to **Pi-Control-Service**. You can save this file anywhere. You will provide a path to the file in your code. The following snippet shows an example configuration file:
 
@@ -39,7 +39,7 @@ A config file, written in [YAML](http://en.wikipedia.org/wiki/YAML), is used to 
 This part runs on your Raspberry Pi. It initializes the desired GPIO pins, connects to RabbitMQ and starts listening for messages.
 
 ```python
-from pi_control_service import GPIOService
+from pi_control_service import GPIOControlService
 
 
 # The RabbitMQ connection string
@@ -51,7 +51,7 @@ DEVICE_KEY='my_awesome_raspberry_pi'
 # Path to the config file referenced in the section above
 PIN_CONFIG = '/path/to/config/file.yml'
 
-gpio_service = GPIOService(
+gpio_service = GPIOControlService(
     rabbit_url=RABBIT_URL,
     device_key=DEVICE_KEY,
     pin_config=PIN_CONFIG)
@@ -60,7 +60,7 @@ gpio_service.start()
 ```
 
 **Note:**
-In addition to the example above, the `GPIOService` class takes an optional argument `reconnect_attempts`. This is in integer represneting the number of times to attempt reconnection with RabbitMQ. These attempts will be made if the connection to RabbitMQ is interrupted after the `start()` method is called.
+In addition to the example above, the `GPIOControlService` class takes an optional argument `reconnect_attempts`. This is in integer represneting the number of times to attempt reconnection with RabbitMQ. These attempts will be made if the connection to RabbitMQ is interrupted after the `start()` method is called.
 
 
 ### Using the GPIO service
@@ -104,7 +104,7 @@ result = pins_client.read_value(DEVICE_KEY, 18)
 
 If you are already familar with RabbitMQ, you can implement your own client using any language. Things to know:
 
-* The exchange name is: `gpio_service`
+* The exchange name is: `gpio_control`
 * The `DEVICE_KEY` value is the routing key
 * The JSON messages sent to the broker should be formatted like the following examples:
 
@@ -155,7 +155,7 @@ If you are already familar with RabbitMQ, you can implement your own client usin
 
 ## Custom action service
 
-The custom action service (`pi_control_service.CustomActionService`) allows you to call methods on a special "actions" class that you define. Using it, the possibilities are almost limitless.
+The custom action service (`pi_control_service.CustomActionControlService`) allows you to call methods on a special "actions" class that you define. Using it, the possibilities are almost limitless.
 
 
 ### Starting the custom action service
@@ -165,7 +165,7 @@ This part runs on your Raspberry Pi. It connects to RabbitMQ and starts listenin
 ```python
 import subprocess
 
-from pi_control_service import CustomActionService
+from pi_control_service import CustomActionControlService
 
 
 # The RabbitMQ connection string
@@ -184,7 +184,7 @@ class Actions(object):
         return subprocess.check_output(["/opt/vc/bin/vcgencmd", "measure_temp"])
 
 
-custom_actions = CustomActionService(
+custom_actions = CustomActionControlService(
     rabbit_url=RABBIT_URL,
     device_key=DEVICE_KEY,
     actions=Actions())
@@ -223,7 +223,7 @@ result = actions_client.call(DEVICE_KEY, 'name_of_action_method')
 
 If you are already familar with RabbitMQ, you can implement your own client using any language. Things to know:
 
-* The exchange name is: `custom_action_service`
+* The exchange name is: `custom_action_control`
 * The `DEVICE_KEY` value is the routing key
 * The JSON messages sent to the broker should be formatted like the following examples:
 

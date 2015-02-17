@@ -1,2 +1,2 @@
-from gpio import GPIOService
-from custom_action import CustomActionService
+from gpio import GPIOControlService
+from custom_action import CustomActionControlService

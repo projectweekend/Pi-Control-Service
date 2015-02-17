@@ -7,13 +7,13 @@ from mixins import ServiceUtils
 ALLOWED_ACTIONS = ('on', 'off', 'read', 'get_config')
 
 
-class GPIOService(ServiceUtils, RPCBlockingConsumer):
+class GPIOControlService(ServiceUtils, RPCBlockingConsumer):
 
     def __init__(self, rabbit_url, device_key, pin_config):
         self._pins = PinManager(config_file=pin_config)
-        super(GPIOService, self).__init__(
+        super(GPIOControlService, self).__init__(
             rabbit_url=rabbit_url,
-            exchange='gpio_service',
+            exchange='gpio_control',
             routing_key=device_key,
             request_action=self._perform_gpio_action)
 
@@ -38,4 +38,4 @@ class GPIOService(ServiceUtils, RPCBlockingConsumer):
 
     def stop(self):
         self._pins.cleanup()
-        super(GPIOService, self).stop()
+        super(GPIOControlService, self).stop()
