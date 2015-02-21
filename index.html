@@ -37,7 +37,7 @@
 
 <p><strong>What it does</strong></p>
 
-<p>Using the GPIO service (<code>pi_control_service.GPIOService</code>) you have access to the Raspberry Pi's digital GPIO pins. You can turn pins on and off as well as read their values. Using the custom action service (<code>pi_control_service.CustomActionService</code>) you can call methods on an "actions" class you implement. This allows you to do just about anything, like: access <a href="http://en.wikipedia.org/wiki/I%C2%B2C">I2C</a>, <a href="http://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus">SPI</a>, or the serial port, and issue system commands.</p>
+<p>Using the GPIO service (<code>pi_control_service.GPIOControlService</code>) you have access to the Raspberry Pi's digital GPIO pins. You can turn pins on and off as well as read their values. Using the custom action service (<code>pi_control_service.CustomActionControlService</code>) you can call methods on an "actions" class you implement. This allows you to do just about anything, like: access <a href="http://en.wikipedia.org/wiki/I%C2%B2C">I2C</a>, <a href="http://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus">SPI</a>, or the serial port, and issue system commands.</p>
 
 <h2>
 <a id="install-it" class="anchor" href="#install-it" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install it</h2>
@@ -46,12 +46,12 @@
 </code></pre>
 
 <h2>
-<a id="gpio-service" class="anchor" href="#gpio-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>GPIO service</h2>
+<a id="gpio-control-service" class="anchor" href="#gpio-control-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>GPIO control service</h2>
 
-<p>The GPIO service (<code>pi_control_service.GPIOService</code>) exposes access to the Raspberry Pi's digital GPIO pins. Using it you can turn pins on and off as well as read their values. The next two sections cover specifics of its configuration and usage.</p>
+<p>The GPIO service (<code>pi_control_service.GPIOControlService</code>) exposes access to the Raspberry Pi's digital GPIO pins. Using it you can turn pins on and off as well as read their values. The next two sections cover specifics of its configuration and usage.</p>
 
 <h3>
-<a id="configuring-the-gpio-service" class="anchor" href="#configuring-the-gpio-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuring the GPIO service</h3>
+<a id="configuring-the-gpio-control-service" class="anchor" href="#configuring-the-gpio-control-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuring the GPIO control service</h3>
 
 <p>A config file, written in <a href="http://en.wikipedia.org/wiki/YAML">YAML</a>, is used to define the initial pin setup. If a pin is not defined here it will not be available to <strong>Pi-Control-Service</strong>. You can save this file anywhere. You will provide a path to the file in your code. The following snippet shows an example configuration file:</p>
 
@@ -73,7 +73,9 @@
 <h3>
 <a id="starting-the-gpio-service" class="anchor" href="#starting-the-gpio-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>Starting the GPIO service</h3>
 
-<div class="highlight highlight-python"><pre><span class="pl-k">from</span> pi_control_service <span class="pl-k">import</span> GPIOService
+<p>This part runs on your Raspberry Pi. It initializes the desired GPIO pins, connects to RabbitMQ and starts listening for messages.</p>
+
+<div class="highlight highlight-python"><pre><span class="pl-k">from</span> pi_control_service <span class="pl-k">import</span> GPIOControlService
 
 
 <span class="pl-c"># The RabbitMQ connection string</span>
@@ -85,12 +87,15 @@ DEVICE_KEY<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'<
 <span class="pl-c"># Path to the config file referenced in the section above</span>
 PIN_CONFIG <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>/path/to/config/file.yml<span class="pl-pds">'</span></span>
 
-gpio_service <span class="pl-k">=</span> GPIOService(
+gpio_service <span class="pl-k">=</span> GPIOControlService(
     <span class="pl-vpf">rabbit_url</span><span class="pl-k">=</span>RABBIT_URL,
     <span class="pl-vpf">device_key</span><span class="pl-k">=</span>DEVICE_KEY,
     <span class="pl-vpf">pin_config</span><span class="pl-k">=</span>PIN_CONFIG)
 
 gpio_service.start()</pre></div>
+
+<p><strong>Note:</strong>
+In addition to the example above, the <code>GPIOControlService</code> class takes an optional argument <code>reconnect_attempts</code>. This is in integer represneting the number of times to attempt reconnection with RabbitMQ. These attempts will be made if the connection to RabbitMQ is interrupted after the <code>start()</code> method is called.</p>
 
 <h3>
 <a id="using-the-gpio-service" class="anchor" href="#using-the-gpio-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using the GPIO service</h3>
@@ -134,7 +139,7 @@ result <span class="pl-k">=</span> pins_client.read_value(DEVICE_KEY, <span clas
 <p>If you are already familar with RabbitMQ, you can implement your own client using any language. Things to know:</p>
 
 <ul>
-<li>The exchange name is: <code>gpio_service</code>
+<li>The exchange name is: <code>gpio_control</code>
 </li>
 <li>The <code>DEVICE_KEY</code> value is the routing key</li>
 <li>The JSON messages sent to the broker should be formatted like the following examples:</li>
@@ -182,14 +187,16 @@ result <span class="pl-k">=</span> pins_client.read_value(DEVICE_KEY, <span clas
 <h2>
 <a id="custom-action-service" class="anchor" href="#custom-action-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>Custom action service</h2>
 
-<p>The custom action service (<code>pi_control_service.CustomActionService</code>) allows you to call methods on a special "actions" class that you define. Using it, the possibilities are almost limitless.</p>
+<p>The custom action service (<code>pi_control_service.CustomActionControlService</code>) allows you to call methods on a special "actions" class that you define. Using it, the possibilities are almost limitless.</p>
 
 <h3>
 <a id="starting-the-custom-action-service" class="anchor" href="#starting-the-custom-action-service" aria-hidden="true"><span class="octicon octicon-link"></span></a>Starting the custom action service</h3>
 
+<p>This part runs on your Raspberry Pi. It connects to RabbitMQ and starts listening for messages.</p>
+
 <div class="highlight highlight-python"><pre><span class="pl-k">import</span> subprocess
 
-<span class="pl-k">from</span> pi_control_service <span class="pl-k">import</span> CustomActionService
+<span class="pl-k">from</span> pi_control_service <span class="pl-k">import</span> CustomActionControlService
 
 
 <span class="pl-c"># The RabbitMQ connection string</span>
@@ -208,7 +215,7 @@ DEVICE_KEY<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'<
         <span class="pl-k">return</span> subprocess.check_output([<span class="pl-s1"><span class="pl-pds">"</span>/opt/vc/bin/vcgencmd<span class="pl-pds">"</span></span>, <span class="pl-s1"><span class="pl-pds">"</span>measure_temp<span class="pl-pds">"</span></span>])
 
 
-custom_actions <span class="pl-k">=</span> CustomActionService(
+custom_actions <span class="pl-k">=</span> CustomActionControlService(
     <span class="pl-vpf">rabbit_url</span><span class="pl-k">=</span>RABBIT_URL,
     <span class="pl-vpf">device_key</span><span class="pl-k">=</span>DEVICE_KEY,
     <span class="pl-vpf">actions</span><span class="pl-k">=</span>Actions())
@@ -245,7 +252,7 @@ result <span class="pl-k">=</span> actions_client.call(DEVICE_KEY, <span class="
 <p>If you are already familar with RabbitMQ, you can implement your own client using any language. Things to know:</p>
 
 <ul>
-<li>The exchange name is: <code>custom_action_service</code>
+<li>The exchange name is: <code>custom_action_control</code>
 </li>
 <li>The <code>DEVICE_KEY</code> value is the routing key</li>
 <li>The JSON messages sent to the broker should be formatted like the following examples:</li>
